@@ -9,6 +9,8 @@ import AddProject from "./pages/AddProject";
 import EditProject from "./pages/EditProject";
 import Favorites from "./pages/Favorites";
 import UserProfile from "./pages/UserProfile";
+import Analytics from "./pages/Analytics";
+
 
 function AppContent() {
   const location = useLocation();
@@ -29,6 +31,7 @@ function AppContent() {
         <Route path="/editproject/:id" element={<EditProject />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/user/:userId" element={<UserProfile />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Routes>
     </>
   );

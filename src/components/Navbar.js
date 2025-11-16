@@ -19,7 +19,7 @@ export default function Navbar() {
   return (
     <nav className="bg-blue-600 text-white p-4">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
-        
+
         {/* Logo/Title */}
         <h1 className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/projects")}>
           Peer Project Hub
@@ -33,6 +33,10 @@ export default function Navbar() {
           >
             Projects
           </button>
+
+          <Link to="/analytics" className="text-gray-700 hover:text-blue-600">
+            📊 Analytics
+          </Link>
 
           <button
             onClick={() => navigate("/favorites")}
