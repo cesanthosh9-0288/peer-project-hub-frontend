@@ -1,55 +1,34 @@
 import { useState } from "react";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "../firebase";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
+  const handleLogin = async () => {
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const firebaseUser = result.user;
+      const res = await axios.post("https://peer-project-hub-backend-seven.vercel.app/login", {
+        username: user,
+        password: pass,
+      });
 
-      console.log("Firebase user:", firebaseUser);
+      if (res.data === true) {
+        const userObj = {
+          uid: Date.now().toString(),
+          username: user,
+          email: user + "@example.com",
+        };
 
-      // Create user object with Firebase UID
-      const userObj = {
-        uid: firebaseUser.uid,  // Firebase UID
-        username: firebaseUser.displayName || firebaseUser.email.split("@")[0],
-        email: firebaseUser.email,
-      };
-
-      console.log("User object created:", userObj);
-
-      // Save to localStorage
-      localStorage.setItem("user", JSON.stringify(userObj));
-      console.log("Saved to localStorage");
-
-      // Create user in backend database
-      try {
-        console.log("Sending POST /user...");
-        const res = await axios.post("https://peer-project-hub-backend-seven.vercel.app/user", {
-          userId: userObj.uid,
-          username: userObj.username,
-          email: userObj.email,
-          bio: "No bio added yet",
-        });
-        console.log("✅ User created in database:", res.data);
-      } catch (dbErr) {
-        console.error("Database error:", dbErr.response?.data || dbErr.message);
-        // Continue anyway - user is in localStorage
+        localStorage.setItem("user", JSON.stringify(userObj));
+        navigate("/projects");
+      } else {
+        setError("Invalid credentials!");
       }
-
-      // Navigate to projects
-      navigate("/projects", { state: { message: "Login Successful!" } });
-
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed: " + err.message);
+      setError("Server error");
     }
   };
 
@@ -59,17 +38,30 @@ export default function Login() {
         <h1 className="text-2xl font-semibold mb-4 text-center">Peer Project Hub</h1>
         <p className="text-gray-600 text-center mb-6">Sign in to continue</p>
 
-        {/* Google Login Button */}
+        <input
+          className="border p-2 mb-3 w-full rounded"
+          placeholder="Username (San)"
+          value={user}
+          onChange={(e) => setUser(e.target.value)}
+        />
+
+        <input
+          className="border p-2 mb-3 w-full rounded"
+          type="password"
+          placeholder="Password (test1234)"
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+        />
+
         <button
-          onClick={handleGoogleLogin}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-semibold flex items-center justify-center gap-2"
+          onClick={handleLogin}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-semibold"
         >
-          🔐 Sign in with Google
+          Login
         </button>
 
-        {/* Error Message */}
         {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
       </div>
     </div>
   );
-}   
+}
