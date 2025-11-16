@@ -35,6 +35,7 @@ export default function AddProject() {
       link: form.link,
       live: form.live,
       authorName: form.authorName,
+      userId: JSON.parse(localStorage.getItem("user"))?.uid || "anonymous",
     };
 
     console.log("✅ Validation passed");
