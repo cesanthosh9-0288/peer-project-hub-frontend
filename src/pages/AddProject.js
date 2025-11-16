@@ -8,7 +8,7 @@ export default function AddProject() {
     tags: "",
     link: "",
     live: "",
-    authorName: "",  // NEW: Author name field
+    authorName: "",
   });
 
   const handleChange = (e) => {
@@ -18,8 +18,12 @@ export default function AddProject() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("=== ADD PROJECT SUBMISSION ===");
+    console.log("Form data:", form);
+
     // Validate all required fields
     if (!form.title.trim() || !form.description.trim() || !form.link.trim() || !form.authorName.trim()) {
+      console.error("❌ Validation failed: Missing required fields");
       alert("Please fill all required fields (Title, Description, GitHub Link, Author Name)");
       return;
     }
@@ -30,20 +34,34 @@ export default function AddProject() {
       tags: form.tags.split(",").map(t => t.trim()).filter(t => t),
       link: form.link,
       live: form.live,
-      authorName: form.authorName,  // Include author name
+      authorName: form.authorName,
     };
 
+    console.log("✅ Validation passed");
+    console.log("📤 Payload to send:", payload);
+
     try {
+      console.log("📡 Sending POST to: https://peer-project-hub-backend-seven.vercel.app/addproject");
+      
       const res = await axios.post("https://peer-project-hub-backend-seven.vercel.app/addproject", payload);
+      
+      console.log("✅ Response received:", res.data);
+
       if (res.data.success) {
+        console.log("✅ Project added successfully!");
         alert("Project Added!");
         window.location.href = "/projects";
       } else {
-        alert("Failed to add project.");
+        console.error("❌ Backend returned success: false");
+        console.error("Response data:", res.data);
+        alert("Failed to add project: " + res.data.data);
       }
     } catch (err) {
-      alert("Server error");
-      console.error(err);
+      console.error("❌ ERROR:", err);
+      console.error("Error message:", err.message);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      alert("Server error: " + (err.response?.data?.data || err.message));
     }
   };
 
